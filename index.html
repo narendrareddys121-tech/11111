@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkyFetch – Advanced Weather Dashboard</title>
+  <meta name="description"
+    content="SkyFetch is a real-time weather dashboard with 5-day forecast, air quality, hourly trends, and geolocation support." />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body class="weather-default">
+  <!-- Animated background particles -->
+  <div class="bg-particles" id="bgParticles"></div>
+  <!-- Weather-specific overlay particles (rain/snow/sun) -->
+  <div class="weather-fx" id="weatherFx"></div>
+
+  <div class="app-wrapper">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <i class="fa-solid fa-cloud-sun logo-icon"></i>
+        <span class="logo-text">Sky<span class="highlight">Fetch</span></span>
+        <span class="version-badge">v2.0</span>
+      </div>
+      <p class="tagline">Real-time weather, beautifully delivered.</p>
+    </header>
+
+    <!-- Search Section -->
+    <section class="search-section">
+      <form class="search-form" id="searchForm" role="search">
+        <div class="search-input-wrapper">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input type="text" id="cityInput" class="search-input" placeholder="Search for a city…" aria-label="City name"
+            autocomplete="off" />
+          <button type="button" class="geo-btn" id="geoBtn" title="Use my location">
+            <i class="fa-solid fa-location-crosshairs"></i>
+          </button>
+          <button type="submit" class="search-btn" id="searchBtn">
+            <span class="btn-text">Get Weather</span>
+            <i class="fa-solid fa-arrow-right btn-icon"></i>
+          </button>
+        </div>
+      </form>
+
+      <!-- Recent Searches -->
+      <div class="recent-searches hidden" id="recentSearches">
+        <span class="recent-label"><i class="fa-solid fa-clock-rotate-left"></i> Recent:</span>
+        <div class="recent-chips" id="recentChips"></div>
+        <button class="clear-recent" id="clearRecent" title="Clear history">
+          <i class="fa-solid fa-trash-can"></i>
+        </button>
+      </div>
+
+      <!-- Quick-city chips -->
+      <div class="quick-cities">
+        <span class="quick-label">Quick search:</span>
+        <button class="city-chip" data-city="London">London</button>
+        <button class="city-chip" data-city="New York">New York</button>
+        <button class="city-chip" data-city="Tokyo">Tokyo</button>
+        <button class="city-chip" data-city="Sydney">Sydney</button>
+        <button class="city-chip" data-city="Mumbai">Mumbai</button>
+        <button class="city-chip" data-city="Dubai">Dubai</button>
+        <button class="city-chip" data-city="Paris">Paris</button>
+      </div>
+    </section>
+
+    <!-- Error Banner -->
+    <div class="error-banner hidden" id="errorBanner" role="alert">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <span id="errorMessage">Something went wrong. Please try again.</span>
+      <button class="close-error" id="closeError" aria-label="Dismiss error">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="loader hidden" id="loader" aria-live="polite" aria-label="Loading weather data">
+      <div class="spinner"></div>
+      <p class="loader-text">Fetching weather data…</p>
+    </div>
+
+    <!-- ============ WEATHER CARD ============ -->
+    <main class="weather-card hidden" id="weatherCard">
+      <!-- Top Row: City + Date/Time -->
+      <div class="card-top">
+        <div class="city-info">
+          <h1 class="city-name" id="cityName">—</h1>
+          <p class="country" id="countryName">—</p>
+        </div>
+        <div class="datetime" id="datetime">—</div>
+      </div>
+
+      <!-- Main Weather -->
+      <div class="card-main">
+        <div class="temp-block">
+          <img class="weather-icon" id="weatherIcon" src="" alt="Weather icon" />
+          <div class="temperature-wrap">
+            <span class="temperature" id="temperature">—</span>
+            <div class="unit-toggle">
+              <button class="unit-btn active" id="celsiusBtn">°C</button>
+              <span class="unit-sep">|</span>
+              <button class="unit-btn" id="fahrenheitBtn">°F</button>
+            </div>
+          </div>
+        </div>
+        <div class="condition-block">
+          <p class="condition" id="condition">—</p>
+          <p class="feels-like">
+            Feels like <span id="feelsLike">—</span>
+          </p>
+          <div class="min-max">
+            <span class="min-temp"><i class="fa-solid fa-arrow-down"></i> <span id="tempMin">—</span></span>
+            <span class="max-temp"><i class="fa-solid fa-arrow-up"></i> <span id="tempMax">—</span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <i class="fa-solid fa-droplet stat-icon"></i>
+          <div>
+            <p class="stat-label">Humidity</p>
+            <p class="stat-value" id="humidity">—</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <i class="fa-solid fa-wind stat-icon"></i>
+          <div>
+            <p class="stat-label">Wind</p>
+            <p class="stat-value" id="windSpeed">—</p>
+            <p class="stat-sub" id="windDir">—</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <i class="fa-solid fa-gauge-high stat-icon"></i>
+          <div>
+            <p class="stat-label">Pressure</p>
+            <p class="stat-value" id="pressure">—</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <i class="fa-solid fa-eye stat-icon"></i>
+          <div>
+            <p class="stat-label">Visibility</p>
+            <p class="stat-value" id="visibility">—</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <i class="fa-solid fa-temperature-half stat-icon"></i>
+          <div>
+            <p class="stat-label">Dew Point</p>
+            <p class="stat-value" id="dewPoint">—</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <i class="fa-solid fa-cloud stat-icon"></i>
+          <div>
+            <p class="stat-label">Cloudiness</p>
+            <p class="stat-value" id="cloudiness">—</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <i class="fa-solid fa-sun stat-icon"></i>
+          <div>
+            <p class="stat-label">Sunrise</p>
+            <p class="stat-value" id="sunrise">—</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <i class="fa-solid fa-moon stat-icon"></i>
+          <div>
+            <p class="stat-label">Sunset</p>
+            <p class="stat-value" id="sunset">—</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer note -->
+      <p class="card-footer">
+        <i class="fa-solid fa-rotate-right"></i> Last updated:
+        <span id="lastUpdated">—</span>
+        <span class="auto-refresh-note">(auto-refreshes every 10 min)</span>
+      </p>
+    </main>
+
+    <!-- ============ AIR QUALITY ============ -->
+    <section class="aqi-section hidden" id="aqiSection">
+      <h2 class="section-title"><i class="fa-solid fa-lungs"></i> Air Quality Index</h2>
+      <div class="aqi-card">
+        <div class="aqi-badge" id="aqiBadge">
+          <span class="aqi-number" id="aqiNumber">—</span>
+          <span class="aqi-label" id="aqiLabel">—</span>
+        </div>
+        <div class="aqi-pollutants" id="aqiPollutants">
+          <!-- Filled by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ HOURLY FORECAST ============ -->
+    <section class="hourly-section hidden" id="hourlySection">
+      <h2 class="section-title"><i class="fa-solid fa-clock"></i> Hourly Forecast</h2>
+      <div class="hourly-scroll" id="hourlyScroll">
+        <!-- Filled by JS -->
+      </div>
+    </section>
+
+    <!-- ============ 5-DAY FORECAST ============ -->
+    <section class="forecast-section hidden" id="forecastSection">
+      <h2 class="section-title"><i class="fa-solid fa-calendar-week"></i> 5-Day Forecast</h2>
+      <div class="forecast-grid" id="forecastGrid">
+        <!-- Filled by JS -->
+      </div>
+    </section>
+
+    <!-- Empty / Welcome State -->
+    <div class="welcome-state" id="welcomeState">
+      <div class="welcome-icon">
+        <i class="fa-solid fa-cloud-sun-rain"></i>
+      </div>
+      <h2 class="welcome-title">Where in the world?</h2>
+      <p class="welcome-sub">
+        Type a city name above, use your location, or pick a quick search to get started.
+      </p>
+    </div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>
+        Powered by
+        <a href="https://openweathermap.org/" target="_blank" rel="noopener noreferrer">OpenWeatherMap API</a>
+        &nbsp;·&nbsp; Built with ❤️ as part of FEWD91
+      </p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>
