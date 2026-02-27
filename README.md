@@ -1,8 +1,14 @@
-# 🌤️ SkyFetch Weather Dashboard — Part 2: User Interaction
+# 🌤️ SkyFetch Weather Dashboard — Part 3: Prototypal Inheritance
 
-A real-time, interactive weather dashboard built as part of **FEWD91**. This Part 2 build enhances the Part 1 foundation with robust user input handling, async/await patterns, comprehensive error handling, and a loading indicator.
+A real-time, interactive weather dashboard built as part of **FEWD91**. This Part 3 build refactors the Part 2 codebase to use **JavaScript Prototypal Inheritance** — all logic is reorganised into a single `WeatherApp` constructor with every method living on `WeatherApp.prototype`.
 
 ## 🚀 Features
+
+### Part 3 Enhancements (Prototypal Inheritance)
+- 🏗️ **WeatherApp constructor** — all DOM references and state initialised in one place
+- 🔗 **Prototype methods** — every function is a method on `WeatherApp.prototype` (no standalone functions)
+- ⚡ **Efficient parallel fetching** — current weather, 5-day forecast, and AQI fetched with `Promise.all`
+- 📅 **5-Day Forecast cards** — responsive `forecast-card` rows with high/low temps, visual temperature bar, and precipitation probability
 
 ### Part 2 Enhancements (User Interaction)
 - 🔍 **City search input** with search button and **Enter key** support
@@ -11,7 +17,7 @@ A real-time, interactive weather dashboard built as part of **FEWD91**. This Par
   - **Empty / invalid input** — user-friendly message when search field is empty or contains invalid characters
   - **Invalid city name (404)** — clear message when the city is not found
   - **Network / API failures** — handles offline state and server errors gracefully
-- 🔄 **Async/Await** — all API logic refactored to use `async/await` (no `.then()` chains or callbacks)
+- 🔄 **Async/Await** — all API logic uses `async/await` (no `.then()` chains or callbacks)
 - 💬 **User-friendly error messages** — every failure scenario shows a clear, helpful message
 
 ### Core Weather (from Part 1)
@@ -41,7 +47,7 @@ A real-time, interactive weather dashboard built as part of **FEWD91**. This Par
 |---|---|
 | HTML5 | Semantic structure |
 | CSS3 | Glassmorphism, animations, responsive grid, weather effects |
-| Vanilla JavaScript | **Async/Await**, try-catch error handling, Geolocation API, localStorage, DOM manipulation |
+| Vanilla JavaScript | **Prototypal Inheritance** (constructor + prototype), Async/Await, Geolocation API, localStorage |
 | [OpenWeatherMap API](https://openweathermap.org/api) | Current weather, forecast, air quality |
 
 ## ⚙️ Setup & Usage
@@ -65,7 +71,7 @@ python -m http.server 5500
 fewd91/
 ├── index.html   # App structure & layout (all sections)
 ├── style.css    # Glassmorphism + weather FX + responsive
-├── app.js       # Async/await API calls, try-catch error handling, rendering
+├── app.js       # WeatherApp constructor + prototype methods
 └── README.md    # This file
 ```
 
@@ -78,19 +84,21 @@ fewd91/
 | `GET /forecast?lat={lat}&lon={lon}&appid={key}&units=metric` | 5-day / 3-hour forecast |
 | `GET /air_pollution?lat={lat}&lon={lon}&appid={key}` | Air quality index & pollutants |
 
-## 🎓 Assignment: FEWD91 — Part 2
+## 🎓 Assignment: FEWD91 — Part 3
 
 ### Concepts Demonstrated
+- ✅ **Prototypal Inheritance** — single `WeatherApp` constructor, all methods on `WeatherApp.prototype`
+- ✅ **Constructor Pattern** — DOM refs and state encapsulated as instance properties (`this.*`)
+- ✅ **Promise.all** — forecast and AQI endpoints fetched in parallel for efficiency
+- ✅ **5-Day Forecast Cards** — responsive layout with temperature bars and precipitation probability
 - ✅ **Async/Await** — all asynchronous operations use `async/await`
 - ✅ **Try-Catch Error Handling** — every async function is wrapped in `try-catch`
 - ✅ **User Input Validation** — empty input, invalid characters, invalid cities
 - ✅ **Loading State** — spinner visible during entire fetch process
 - ✅ **User-Friendly Error Messages** — no raw error codes shown to users
-- ✅ **DOM Manipulation** — dynamic rendering of weather data
-- ✅ **Event Handling** — form submit, button clicks, Enter key support
 
 ### Testing Performed
-1. ✅ Valid city search (e.g., "London") → weather data displayed
+1. ✅ Valid city search (e.g., "London") → current weather + 5-day forecast + AQI displayed
 2. ✅ Enter key search → same as button click
 3. ✅ Invalid city (e.g., "xyzabc") → "City not found" error message
 4. ✅ Empty input → "Please enter a city name" error message
@@ -99,4 +107,5 @@ fewd91/
 7. ✅ Quick-search chips → data loads correctly
 8. ✅ Geolocation → location detected and weather shown
 9. ✅ Recent searches → stored and clickable
-10. ✅ Temperature unit toggle → all values update
+10. ✅ Temperature unit toggle → all values update (including forecast cards)
+11. ✅ 5-day forecast cards → show day name, date, icon, high/low temp, temp bar, precipitation %
