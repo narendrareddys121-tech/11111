@@ -74,6 +74,7 @@ WeatherApp.prototype._init = function () {
     this.renderRecentSearches();
     this.showWelcome();
     this._bindEvents();
+    this.loadLastCity();
 };
 
 WeatherApp.prototype._bindEvents = function () {
@@ -302,6 +303,13 @@ WeatherApp.prototype.renderRecentSearches = function () {
 WeatherApp.prototype.clearRecentSearches = function () {
     localStorage.removeItem("skyfetch_recent");
     this.renderRecentSearches();
+};
+
+WeatherApp.prototype.loadLastCity = function () {
+    var recent = this.getRecentSearches();
+    if (recent.length > 0) {
+        this.handleSearch(recent[0]);
+    }
 };
 
 // ═══════════════════════════════════════════════════════════════
